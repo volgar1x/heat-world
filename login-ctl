@@ -1,0 +1,54 @@
+#!/bin/sh
+
+base=`dirname $0`
+
+case "$1" in
+  "start")
+    mkdir -p "$base/tmp"
+    (cd "$base" && "$base/bin/login-distrib" & echo $! > "$base/tmp/pid")
+    echo "Started!"
+    ;;
+
+  "stop")
+    if [ -f "$base/tmp/pid" ]; then
+      pid="$(cat $base/tmp/pid)"
+      if ps -p "$pid" > /dev/null; then
+        kill -15 "$pid"
+        while ps -p "$pid" > /dev/null; do
+          sleep 1
+        done
+      fi
+      rm "$base/tmp/pid"
+      echo "Stopped!"
+    fi
+    ;;
+
+  "status")
+    if [ -f "$base/tmp/pid" ]; then
+      pid="$(cat $base/tmp/pid)"
+      if ps -p "$pid" > /dev/null; then
+        echo "Running!"
+      else
+        echo "Stalled pid file."
+        read -p "Should I remove it? [Y/N]" yn
+        case "$yn" in
+          [Yy]*) rm "$base/tmp/pid" ;;
+        esac
+      fi
+    else
+      echo "Not Running!"
+    fi
+    ;;
+
+  "logs")
+    tac "$base/heat-login.log" | less
+    ;;
+
+  "console")
+    (cd "$base" && "$base/bin/login-distrib")
+    ;;
+
+  *)
+    echo "Unknown command $1"
+    ;;
+esac

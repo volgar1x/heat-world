@@ -1,0 +1,15 @@
+dependencies {
+    compile "org.heat.dofus:d2util:$heatD2util"
+    compile "org.heat.dofus:d2vendor:$heatD2vendor"
+    compile("org.heat:util-io:$heatUtil") {
+        exclude group: 'io.netty'
+    }
+
+    compile "io.netty:netty-buffer:$netty"
+
+    compile "org.rocket:rocket-api:$rocket"
+}
+
+test {
+    workingDir = rootDir
+}

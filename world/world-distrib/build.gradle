@@ -1,0 +1,27 @@
+dependencies {
+    compile project(':shared:datacenter')
+
+    compile project(':world:world-backend')
+    compile project(':world:world-frontend')
+
+    compile "com.github.blackrush.acara:acara-core:$acara"
+
+    compile "io.netty:netty-handler:$netty"
+    compile "org.jboss.marshalling:jboss-marshalling:$jbossMarshalling"
+    compile "org.jboss.marshalling:jboss-marshalling-river:$jbossMarshalling"
+    compile "org.rocket:rocket-network-netty:$rocket"
+    compile "org.rocket:rocket-dist:$rocket"
+
+    runtime "ch.qos.logback:logback-classic:$logback"
+
+    compile "com.zaxxer:HikariCP:$hikari"
+    runtime("com.impossibl.pgjdbc-ng:pgjdbc-ng:$pgjdbc") {
+        exclude module: 'netty-all'
+    }
+}
+
+apply plugin: 'application'
+mainClassName = 'org.heat.world.App'
+run {
+    workingDir = rootProject.projectDir
+}

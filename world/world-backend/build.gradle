@@ -1,0 +1,5 @@
+dependencies {
+    compile project(':world-api:world-backend-api')
+    compile project(':world-api:world-players-api')
+    compile "org.rocket:rocket-network:$rocket"
+}

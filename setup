@@ -1,0 +1,90 @@
+#!/bin/bash
+
+if [ -z "$EDITOR" ]; then
+	if [ -n "$(which editor)" ]; then
+		EDITOR="$(which editor)"
+	else
+		EDITOR="$(which vi)"
+	fi
+fi
+
+if [ -z "$GRADLE" ]; then
+	if [ -n "$(which gradle)" ]; then
+		GRADLE="$(which gradle)"
+	else
+		GRADLE="$PWD/gradlew"
+	fi
+fi
+
+if [ -z "$GIT" ]; then
+	if [ -n "$(which git)" ]; then
+		GIT="$(which git)"
+	else
+		echo "You must install Git."
+		exit 1
+	fi
+fi
+
+log() {
+  echo "> $@"
+  "$@"
+}
+
+#########################################################################
+## User Gradle configuration
+if [[ ! -f "$HOME/.gradle/gradle.properties" ]]; then
+  log mkdir -p "$HOME/.gradle"
+
+  echo """
+archivaPubInternal=
+archivaPubSnapshots=
+archivaSubInternal=
+archivaSubSnapshots=
+archivaPubUsername=
+archivaPubPassword=
+archivaSubUsername=
+archivaSubPassword=
+""" > ~/.gradle/gradle.properties
+  log "$EDITOR" "$HOME/.gradle/gradle.properties"
+fi
+
+#########################################################################
+## Project Gradle configuration
+if [ ! -f "login/gradle.properties" ]; then
+  log cp login/gradle.properties.dist login/gradle.properties
+fi
+log "$EDITOR" login/gradle.properties
+
+if [ ! -f "world/gradle.properties" ]; then
+  log cp world/gradle.properties.dist world/gradle.properties
+fi
+log "$EDITOR" world/gradle.properties
+
+#########################################################################
+## Heat configuration
+if [ ! -f "world.conf" ]; then
+  log cp world.conf.dist world.conf
+fi
+log "$EDITOR" world.conf
+
+if [ ! -f "login.conf" ]; then
+  log cp login.conf.dist login.conf
+fi
+log "$EDITOR" login.conf
+
+#########################################################################
+## heat/dist
+log "$GIT" submodule init
+log "$GIT" submodule update
+log ./dist/setup
+
+#########################################################################
+## PostgreSQL
+echo 'Make sure you started your PostgreSQL server.'
+echo -n 'Press [ENTER] when you are done'
+read
+## Flyway will not allow us to run all these actions at once
+## It thinks that login and world migrations are related and mix up versions
+## and go bat-shit crazy about it.
+log "$GRADLE" migrateInit migrateUp
+

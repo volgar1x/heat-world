@@ -1,0 +1,4 @@
+migrateHost=localhost
+migrateDb=heat_world_jiva
+migrateUser=antoine
+migratePass=lel

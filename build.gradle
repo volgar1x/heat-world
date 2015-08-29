@@ -1,0 +1,82 @@
+allprojects {
+    apply plugin: 'java'
+    apply plugin: 'idea'
+
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+    group = 'org.heat'
+    version = '0.1-SNAPSHOT'
+
+    apply from: rootDir.absolutePath + "/gradle/remote.gradle"
+
+    //noinspection GroovyAssignabilityCheck
+    ext.lombok = '1.14.0'
+    ext.junit = '4.11'
+    ext.mockito = '1.9.5'
+    ext.fungsi = '1.2.+'
+    ext.guava = '18.0'
+    ext.config = '1.2.+'
+    ext.rocket = '1.2-alpha7'
+    ext.acara = '2.0-alpha3'
+    ext.netty = '4.0.+'
+    ext.logback = '1.1.+'
+    ext.jbossMarshalling = '1.4.+'
+    ext.pgjdbc = '0.3'
+    ext.pgsql = '9.3-1102-jdbc41'
+    ext.hikari = '2.0.+'
+    ext.guice = '3.0'
+    ext.heatUtil = '0.4.+'
+    ext.heatD2util = '0.5.+'
+    ext.heatD2vendor = '2.21.3-9'
+
+    
+    javadoc.enabled = false
+
+    configurations.all {
+        resolutionStrategy {
+            cacheChangingModulesFor 0, 'seconds'
+            force 'com.github.blackrush.acara:acara-api:2.0-alpha3'
+            force 'com.github.blackrush.acara:acara-core:2.0-alpha3'
+            force 'com.github.blackrush.acara:acara-core-java:2.0-alpha3'
+        }
+    }
+
+    configurations {
+        provided
+    }
+
+    dependencies {
+        provided "org.projectlombok:lombok:$lombok"
+
+        testCompile "junit:junit:$junit"
+        testCompile "org.mockito:mockito-core:$mockito"
+        testCompile "org.heat:util-testing:$heatUtil"
+    }
+
+    sourceSets {
+        main { compileClasspath += [configurations.provided] }
+        test { compileClasspath += [configurations.provided] }
+    }
+
+    idea { module { scopes.PROVIDED.plus += [configurations.provided] } }
+
+    test {
+        workingDir rootProject.projectDir
+    }
+
+    compileJava {
+        options.compilerArgs << '-Xlint:all' << '-Xlint:-serial' << '-Xlint:-processing'
+        options.encoding = 'UTF-8'
+    }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.4'
+}
+
+task docs(type: Javadoc) {
+    source         = files(allprojects*.sourceSets*.main*.allJava)
+    classpath      = files(allprojects*.sourceSets*.main*.compileClasspath)
+    destinationDir = file("${buildDir}/docs/docs")
+}
+

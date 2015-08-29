@@ -1,0 +1,11 @@
+dependencies {
+    compile project(':world-api')
+    compile project(':world-api:world-items-api')
+
+    compile "com.github.blackrush.acara:acara-api:$acara"
+    compile "org.rocket:rocket-api:$rocket"
+
+    compile "org.heat.dofus:d2vendor:$heatD2vendor"
+    compile project(':shared')
+    compile "org.heat:util:$heatUtil"
+}

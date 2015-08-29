@@ -1,0 +1,5 @@
+dependencies {
+    compile project(':login-api:login-backend-api')
+    compile project(':login-api:login-users-api')
+    compile "org.rocket:rocket-network:$rocket"
+}

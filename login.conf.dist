@@ -1,0 +1,23 @@
+heat {
+  login {
+    frontend {
+      port = 5555
+      ankama-pub-key-path = "dist/Dofus_pubkey.bin"
+      backlog = 10000
+    }
+    backend {
+      port = 4444
+      backlog = 50
+    }
+    db {
+      dataSourceClassName = "org.postgresql.ds.PGSimpleDataSource"
+
+      dataSource {
+        serverName = localhost
+        user = antoine
+        password = lel
+        databaseName = heat_login
+      }
+    }
+  }
+}

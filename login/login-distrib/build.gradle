@@ -1,0 +1,43 @@
+dependencies {
+    compile project(':login:login-backend')
+    compile project(':login:login-frontend')
+
+    compile "com.github.blackrush.acara:acara-core:$acara"
+    compile "org.rocket:rocket-dist:$rocket"
+    runtime "ch.qos.logback:logback-classic:$logback"
+
+    compile "io.netty:netty-transport:$netty"
+    compile "io.netty:netty-codec:$netty"
+    compile "io.netty:netty-handler:$netty"
+    compile "org.rocket:rocket-network-netty:$rocket"
+
+    compile "org.jboss.marshalling:jboss-marshalling:$jbossMarshalling"
+    compile "org.jboss.marshalling:jboss-marshalling-river:$jbossMarshalling"
+
+    // runtime("com.impossibl.pgjdbc-ng:pgjdbc-ng:$pgjdbc") {
+    //     exclude module: 'netty-all'
+    // }
+    runtime "org.postgresql:postgresql:$pgsql"
+    compile "com.zaxxer:HikariCP:$hikari"
+}
+
+apply plugin: 'application'
+mainClassName = 'org.heat.login.Main'
+applicationDefaultJvmArgs = ["-Xmx60m",  "-Xms60m", "-Dlogback.configurationFile=logback.xml"]
+
+run {
+    workingDir = rootProject.projectDir
+}
+
+applicationDistribution.from(rootProject.projectDir) {
+    include 'login.conf.dist'
+    include 'logback.xml.dist'
+    include 'login-ctl'
+
+    rename '.dist', ''
+}
+
+applicationDistribution.from("${rootProject.projectDir}/dist") {
+    include 'Dofus_pubkey.bin'
+    into 'dist'
+}

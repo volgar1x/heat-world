@@ -1,0 +1,8 @@
+dependencies {
+    compile "org.fungsi:fungsi-core:$fungsi"
+    compile "com.google.guava:guava:$guava"
+    compile "org.heat.dofus:d2vendor:$heatD2vendor"
+    compile "org.rocket:rocket-api:$rocket"
+}
+
+

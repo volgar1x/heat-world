@@ -1,0 +1,11 @@
+dependencies {
+    compile project(':world-api:world-backend-api')
+    compile project(':world-api:world-frontend-api')
+    compile project(':world-api:world-players-api')
+    compile project(':world-api:world-items-api')
+    compile project(':world-api:world-trading-api')
+    compile project(':world-api:world-groups-api')
+    compile project(':world-api:world-commands-api')
+    compile project(':world-api:world-guilds-api')
+    compile "org.rocket:rocket-network:$rocket"
+}

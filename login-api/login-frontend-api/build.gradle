@@ -1,0 +1,3 @@
+dependencies {
+    compile "org.heat.dofus:d2vendor:$heatD2vendor"
+}

@@ -1,0 +1,15 @@
+dependencies {
+    compile "org.heat:util:$heatUtil"
+    compile "org.heat.dofus:d2vendor:$heatD2vendor"
+    compile project(':shared')
+    compile project(':shared:datacenter')
+
+    compile "org.rocket:rocket-api:$rocket"
+    compile "com.github.blackrush.acara:acara-api:$acara"
+}
+
+test {
+    workingDir rootProject.projectDir
+}
+
+build.dependsOn subprojects*.build

@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+
+install_trusty() {
+	if [[ $EUID -ne 0 ]]; then
+		echo "Retry with sudo."
+		exit 1
+	fi
+
+	apt-get install libgtk2.0-0:i386
+	apt-get install libgnome-keyring0:i386 libnss3-1d:i386 libnspr4-0d:i386
+	ln -s /usr/lib/x86_64-linux-gnu/libgnome-keyring.so.0 /usr/lib/libgnome-keyring.so.0
+	ln -s /usr/lib/x86_64-linux-gnu/libgnome-keyring.so.0.2.0 /usr/lib/libgnome-keyring.so.0.2.0
+	wget http://airdownload.adobe.com/air/lin/download/2.6/AdobeAIRInstaller.bin -P /tmp
+	chmod u+x /tmp/AdobeAIRInstaller.bin
+	/tmp/AdobeAIRInstaller.bin
+	rm /tmp/AdobeAIRInstaller.bin
+	apt-get --purge remove libgnome-keyring0:i386 libnss3-1d:i386 libnspr4-0d:i386
+}
+
+install_ubuntu() {
+	release="$(lsb_release -sr)"
+
+	case "$release" in
+		14.04|0.3) install_trusty ;;
+		*) echo "Unsupported release $version" ;;
+	esac
+}
+
+install_linux() {
+	if ! which 'lsb_release' > /dev/null; then
+		echo "Unsupported Linux distribution"
+	fi
+	lsb_release -sd
+
+	case "$(lsb_release -si)" in
+		Ubuntu|elementary\ OS) install_ubuntu ;;
+		*) echo "Unsupported distribution $(lsb_release -si)."
+	esac
+}
+
+read -p "Press [ENTER] when ready or [CTRL-C] to cancel."
+case "$(uname)" in
+	"Linux") install_linux ;;
+	*) echo "Unsupported operating system $(uname)." ;;
+esac
+
+

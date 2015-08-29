@@ -1,0 +1,36 @@
+#!/bin/bash
+
+#########################################################################
+## Configuration
+BASE=`dirname $0`
+GRADLE="$BASE/gradlew"
+GIT=`which git`
+
+########################################################################
+## Common functions
+log() {
+  echo "> $@"
+  "$@"
+}
+
+undist() {
+	log cp "$1" "${1%'.dist'}"
+}
+
+#########################################################################
+## Project Gradle configuration
+undist world/gradle.properties.dist
+undist login/gradle.properties.dist
+
+#########################################################################
+## Heat configuration
+undist world.conf.dist
+undist login.conf.dist
+undist shared/datacenter/src/test/resources/application.conf.dist
+
+#########################################################################
+## heat/dist
+log git submodule init
+log git submodule update
+log ./dist/setup
+

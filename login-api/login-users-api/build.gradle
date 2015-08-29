@@ -1,0 +1,4 @@
+dependencies {
+    compile "org.heat:util:$heatUtil"
+    compile project(':shared')
+}

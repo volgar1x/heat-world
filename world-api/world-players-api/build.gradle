@@ -1,0 +1,12 @@
+dependencies {
+    compile project(':world-api')
+    compile project(':world-api:world-items-api')
+    compile project(':world-api:world-roleplay-api')
+    compile project(':world-api:world-trading-api')
+    compile project(':world-api:world-groups-api')
+    compile project(':world-api:world-chat-api')
+    compile project(":world-api:world-commands-api")
+    compile project(':world-api:world-guilds-api')
+
+    compile "org.heat:util:$heatUtil"
+}

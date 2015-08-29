@@ -1,0 +1,44 @@
+include 'flyroad'
+
+////////////////////////////////////////////
+// SHARED
+////////////////////////////////////////////
+include 'shared'
+    include 'shared:backend'
+    include 'shared:distrib'
+    include 'shared:datacenter'
+
+////////////////////////////////////////////
+// LOGIN
+////////////////////////////////////////////
+include 'login'
+    include 'login:login-backend'
+    include 'login:login-frontend'
+    include 'login:login-distrib'
+
+include 'login-api'
+    include 'login-api:login-backend-api'
+    include 'login-api:login-frontend-api'
+    include 'login-api:login-users-api'
+
+////////////////////////////////////////////
+// WORLD
+////////////////////////////////////////////
+include 'world'
+    include 'world:world-backend'
+    include 'world:world-frontend'
+    include 'world:world-distrib'
+
+include 'world-api'
+    include 'world-api:world-backend-api'
+    include 'world-api:world-frontend-api'
+    include 'world-api:world-items-api'
+    include 'world-api:world-roleplay-api'
+    include 'world-api:world-players-api'
+    include 'world-api:world-trading-api'
+    include 'world-api:world-groups-api'
+    include 'world-api:world-chat-api'
+    include 'world-api:world-commands-api'
+    include 'world-api:world-guilds-api'
+
+

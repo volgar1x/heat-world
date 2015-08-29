@@ -1,0 +1,43 @@
+apply plugin: "maven"
+
+repositories {
+    maven {
+        url archivaSubInternal
+        credentials {
+            username archivaSubUsername
+            password archivaSubPassword
+        }
+    }
+
+    maven {
+        url archivaSubSnapshots
+        credentials {
+            username archivaSubUsername
+            password archivaSubPassword
+        }
+    }
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allJava
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives sourcesJar, javadocJar
+}
+
+uploadArchives {
+    repositories.mavenDeployer {
+		def pubUrl = project.version.endsWith("SNAPSHOT") ? archivaPubSnapshots : archivaPubInternal
+
+		repository(url: pubUrl) {
+			authentication(userName: archivaPubUsername, password: archivaPubPassword)
+		}
+    }
+}

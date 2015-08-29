@@ -1,0 +1,11 @@
+dependencies {
+    compile project(':world-api')
+
+    compile "org.heat:util:$heatUtil"
+    compile project(':shared')
+    compile "com.google.inject:guice:$guice"
+
+    compile("org.heat.dofus:d2vendor:$heatD2vendor") {
+        exclude group: 'io.netty'
+    }
+}

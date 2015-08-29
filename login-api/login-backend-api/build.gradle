@@ -1,0 +1,5 @@
+dependencies {
+    compile "org.heat:util:$heatUtil"
+    compile project(':shared:backend')
+    compile "org.rocket:rocket-network:$rocket"
+}

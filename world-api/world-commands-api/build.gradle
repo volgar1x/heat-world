@@ -1,0 +1,7 @@
+dependencies {
+    compile project(':shared')
+    compile "org.heat:util:$heatUtil"
+    compile "com.google.inject:guice:$guice"
+    compile "com.google.inject.extensions:guice-multibindings:$guice"
+    compile "com.github.blackrush.acara:acara-api:$acara"
+}

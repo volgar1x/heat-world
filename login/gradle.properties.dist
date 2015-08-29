@@ -1,0 +1,4 @@
+migrateHost=localhost
+migrateDb=heat_login
+migrateUser=antoine
+migratePass=lel

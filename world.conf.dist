@@ -1,0 +1,98 @@
+heat {
+  world {
+    // this ID must be present in the D2O files
+    // 1=Jiva
+    id = 1
+
+    // fine tuning threading options
+    workers-parallelism = 0
+    scheduler-core-size = 2
+
+    // backend configuration
+    backend {
+      host = 127.0.0.1
+      port = 4444
+      user-auth-ttl = 2s // the amount of time a user is allowed to move from login to world instance
+    }
+
+    // frontend configuration
+    frontend {
+      public-host = 127.0.0.1
+      port = 5556
+      backlog = 64 // recommended to use a higher value
+    }
+
+    // database configuration
+    db {
+      // driver class name, leave as is if not sure
+      dataSourceClassName = "com.impossibl.postgres.jdbc.PGDataSource"
+
+      // the following is driver specific
+      dataSource {
+        host = localhost
+        user = antoine
+        password = lel
+        database = heat_world_jiva
+      }
+    }
+
+    // the D2O files used in order to model the world
+    datacenter-path = "./dist/d2objects"
+
+    // the experience table applied to players
+    experience-table-path = "./dist/experience.txt"
+    
+    // the minimum level to be able to receive and send messages on the admin channel
+    // BOTTOM, USER, PREMIUM, POWER_USER, SUPPORT, ANNOUNCER, ANIMATOR, MODERATOR, GAME_MASTER, ADMIN, GOD, TOP
+    chat-admin-min-level = SUPPORT
+
+    // player configuration
+    player {
+      // the user will be prompted its secret answer when its character's level is equal or higher to the following configuration value
+      remove-required-answer-min-level = 20
+
+      // various start values applied to players
+      start {
+        // the starting location
+        map = 16395
+        cell = 355
+        direction = 1
+
+        // the starting level, make sure its contained in your experience table
+        level = 1
+
+        // the starting amount of kamas, must not overflow a 32bits sized integer
+        kamas = 0
+
+        // the starting characteristics
+        life = 55
+        max-energy = 10000
+        energy = 10000
+        actions = 6
+        movements = 3
+        prospecting = 100
+        stats-points = 0
+        spells-points = 0
+      }
+    }
+
+    // map loader configuration
+    maps {
+      load-timeout = 30s // abort the operation if higher than this value
+      data-path = "./dist" // where the loader should find the maps
+      origin = "maps0.d2p"
+      key = "649ae451ca33ec53bbcbcc33becf15f4" // key used in 2.21.3 client
+    }
+
+    // group settings
+    groups {
+      max-members = 15 // your players can't have groups larger than this value
+    }
+
+    // guild settings
+    guilds {
+      // The initial percentage of experience given by each members of the guild.
+      initial-given-experience-percent = 15
+    }
+  }
+}

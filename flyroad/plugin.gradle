@@ -1,0 +1,140 @@
+apply plugin: 'groovy'
+
+configurations {
+    migration
+}
+dependencies {
+    migration 'org.postgresql:postgresql:9.3-1102-jdbc41'
+    migration localGroovy()
+    migration project(':flyroad')
+}
+sourceSets {
+    migration {
+        groovy {
+            srcDirs = ['src/main/migration']
+            compileClasspath = configurations.migration
+        }
+    }
+}
+
+import groovy.sql.Sql
+
+def SQL(String db = migrateDb) {
+    groovy.sql.Sql.class.classLoader.addURLs configurations.migration*.toURI()*.toURL()
+    groovy.sql.Sql.newInstance("jdbc:postgresql://${migrateHost}/$db", migrateUser, migratePass, "org.postgresql.Driver")
+}
+
+task("migrateInit", group: 'Flyroad', description: 'Initialize the target database') << {
+    def sql = SQL("postgres")
+    def rows = sql.rows("select 1 from pg_catalog.pg_database where datname=${migrateDb}")
+    if (rows.size() == 1) {
+        sql.execute("select pg_terminate_backend(pid) from pg_stat_activity where datname=${migrateDb}")
+        sql.execute("drop database " + migrateDb)
+    }
+    sql.execute("create database " + migrateDb)
+    sql = SQL(migrateDb)
+    sql.execute("create table schema_version(id varchar not null primary key, name varchar not null)")
+}
+
+task("migrateClean", group: 'Flyroad', description: 'Clean the target database') << {
+    def sql = SQL("postgres")
+    sql.execute("drop database " + migrateDb)
+}
+
+task("migrateNew", group: 'Flyroad', description: 'Create a new migration') << {
+    print "> Migration Name: "
+    def name = new Scanner(System.in).nextLine()
+    def version = new Date().format("yyyyMMddHHmmss")
+    def author = "git config --global user.name".execute().text.trim()
+
+    def filename = "${version}_${name}.groovy"
+    def dir = sourceSets.migration.groovy.srcDirs[0]
+    dir.mkdirs()
+    def file = new File(dir, filename)
+    file.write """// Version ${version}
+// Name    ${name}
+// Author  ${author}
+
+import com.github.blackrush.flyroad.*
+
+class Migration_${version}_${name} implements Migration {
+    def up() {
+
+    }
+
+    def down() {
+
+    }
+}
+"""
+}
+
+task("migrateUp", group: 'Flyroad', description: 'Migrate all pending migrations', dependsOn: migrationClasses) << {
+    def sql = SQL()
+    def last = sql.rows("select max(id) from schema_version")[0].max
+
+    def pending = []
+    sourceSets.migration.output.classesDir.eachFile { file ->
+        def (_, cls, version, _name) = (file.name =~ /^(Migration_(\d+)_(.+))\.class$/)[0]
+        if (version > last) {
+            pending.add(cls)
+        }
+    }
+
+    if (pending.empty) {
+        println "All migrations has been merged."
+        return
+    }
+
+    def jdbcArgs = ["up", "jdbc:postgresql://${migrateHost}/${migrateDb}", migrateUser, migratePass]
+
+    javaexec {
+        args = jdbcArgs + pending
+        classpath = sourceSets.migration.output + configurations.migration
+        main = 'com.github.blackrush.flyroad.Migrator'
+    }
+}
+
+migrateUp {
+    enabled = sourceSets.migration.output.classesDir.exists()
+}
+
+task("migrateDown", group: 'Flyroad', description: 'Rollback last migration', dependsOn: migrationClasses) << {
+    def sql = SQL()
+    def row = sql.rows("select id, name from schema_version where id=(select max(id) from schema_version)")[0]
+
+    def jdbcArgs = ["down", "jdbc:postgresql://${migrateHost}/${migrateDb}", migrateUser, migratePass]
+
+    javaexec {
+        args = jdbcArgs + ["Migration_${row.id}_${row.name}"]
+        classpath = sourceSets.migration.output + configurations.migration
+        main = 'com.github.blackrush.flyroad.Migrator'
+    }
+}
+
+migrateDown {
+    enabled = sourceSets.migration.output.classesDir.exists()
+}
+
+task("migrateDiff", group: 'Flyroad', description: 'Print all pending migrations') << {
+    def sql = SQL()
+    def last = sql.rows("select max(id) from schema_version")[0].max
+
+    def found = []
+    sourceSets.migration.groovy.files.each { file ->
+        def (_, fullname, version, _name) = (file.name =~ /^((\d+)_(.+))\.groovy$/)[0]
+        if (version > last) {
+            found << fullname
+        }
+    }
+
+    if (found.empty) {
+        println "All migrations has been merged."
+    } else {
+        found.sort(true)
+        found.each {
+            def name = it.substring(it.indexOf('_') + 1).replace("_", " ")
+            println "* '${name}' pending"
+        }
+    }
+}
